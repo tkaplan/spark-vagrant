@@ -6,26 +6,25 @@ class yarn::users {
 
 	user { 'hadoop':
 		name => 'hadoop',
-		ensure => present
+		ensure => present,
+		require => Group['hadoop']
 	}
 
 	user { 'yarn':
 		ensure => present,
-		groups => ['hadoop']
+		groups => ['hadoop'],
+		require => User['hadoop']
 	}
 
 	user { 'hdfs':
 		ensure => present,
-		groups => ['hadoop']
+		groups => ['hadoop'],
+		require => User['hadoop']
 	}
 
 	user { 'mapred':
 		ensure => present,
-		groups => ['hadoop']
-	}
-
-	user { 'spark':
-		ensure => present,
-		groups => ['hadoop']
+		groups => ['hadoop'],
+		require => User['hadoop']
 	}
 }

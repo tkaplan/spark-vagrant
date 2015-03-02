@@ -7,15 +7,13 @@ class yarn::hadoop (
   $spark_name =  "spark-1.2.1-bin-hadoop2.4"
 ) {
     exec { 'hadoop_download':
-      command => "wget ${hadoop_archive} && tar -xzvf ${hadoop_name}.tar.gz && mv ${hadoop_name} /usr/local/hadoop && rm ${hadoop_name}.tar.gz",
+      command => "wget ${hadoop_archive} && tar -xzvf ${hadoop_name}.tar.gz && mv ${hadoop_name} /usr/local/hadoop && rm ${hadoop_name}.tar.gz && chown hadoop:hadoop /usr/local/hadoop -R && chmod 0774 /usr/local/hadoop -R",
       path => '/bin:/usr/bin:/usr/sbin',
-      require => Package['wget']
-    }
-
-    exec { 'spark_download':
-      command => "wget ${spark_archive} && tar -xzvf ${spark_name}.tgz && mv ${spark_name} /usr/local/spark && rm ${spark_name}.tgz",
-      path => '/bin:/usr/bin:/usr/sbin',
-      require => Package['wget']
+      timeout => 0,
+      require => [
+        Package['wget'],
+        User['hadoop']
+      ]
     }
 
     file { [
@@ -26,7 +24,13 @@ class yarn::hadoop (
       ensure => 'directory',
       owner => 'hadoop',
       group => 'hadoop',
-      mode => 0750
+      mode => 0774,
+      require => User[
+        'hadoop',
+        'yarn',
+        'hdfs',
+        'mapred'
+      ]
     }
 
   	file { [
@@ -39,7 +43,7 @@ class yarn::hadoop (
   		owner => 'hdfs',
   		group => 'hadoop',
       require => File['/var/data','/var/data/hadoop'],
-  		mode => 0750
+  		mode => 0774
   	}
 
   	file { [
@@ -49,7 +53,7 @@ class yarn::hadoop (
   		owner => 'yarn',
       require => File['/var/log/hadoop'],
   		group => 'hadoop',
-  		mode => 0750
+  		mode => 0774
   	}
 
     file { [
@@ -57,6 +61,8 @@ class yarn::hadoop (
     ]:
       require => Exec['hadoop_download'],
       ensure => file,
+      group => 'hadoop',
+      mode => 0774,
       content => template('yarn/core-site.xml.erb')
     }
 
@@ -65,6 +71,40 @@ class yarn::hadoop (
     ]:
       require => Exec['hadoop_download'],
       ensure => file,
+      group => 'hadoop',
+      mode => 0774,
       content => template('yarn/hdfs-site.xml.erb')
+    }
+
+    exec { 'format hdfs':
+      command => '/usr/local/hadoop/bin/hdfs namenode -format &> format_hdfs.log',
+      user => 'hdfs',
+      cwd => '/usr/local/hadoop',
+      require => [
+        File[
+          '/usr/local/hadoop/etc/hadoop/core-site.xml',
+          '/usr/local/hadoop/etc/hadoop/hdfs-site.xml',
+          '/var/data/hadoop/hdfs',
+          '/var/data/hadoop/hdfs/nn',
+          '/var/data/hadoop/hdfs/snn',
+          '/var/data/hadoop/hdfs/dn',
+          '/var/log/hadoop/yarn'
+        ],
+        Package['oracle-java8-set-default']
+      ]
+    }
+
+    exec { 'start hdfs':
+      command => '/usr/local/hadoop/sbin/hadoop-daemon.sh start namenode && /usr/local/hadoop/sbin/hadoop-daemon.sh start secondarynamenode && /usr/local/hadoop/sbin/hadoop-daemon.sh start datanode &> start_hdfs.log',
+      cwd => '/usr/local/hadoop',
+      user => 'hdfs',
+      require => Exec['format hdfs']
+    }
+
+    exec { 'start cluster':
+      command => '/usr/local/hadoop/sbin/yarn-daemon.sh start resourcemanager && /usr/local/hadoop/sbin/yarn-daemon.sh start nodemanager &> start_cluster.log',
+      cwd => '/usr/local/hadoop',
+      user => 'yarn',
+      require => Exec['start hdfs']
     }
 }
