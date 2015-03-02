@@ -2,13 +2,12 @@ class yarn::hadoop (
   $namenode_port = 9000,
   $dfs_replication = 3,
   $hadoop_archive = "http://mirror.olnevhost.net/pub/apache/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz",
-  $spark_archive = "http://d3kbcqa49mib13.cloudfront.net/spark-1.2.1-bin-hadoop2.4.tgz",
-  $hadoop_name = "hadoop-2.6.0",
-  $spark_name =  "spark-1.2.1-bin-hadoop2.4"
+  $hadoop_name = "hadoop-2.6.0"
 ) {
     exec { 'hadoop_download':
       command => "wget ${hadoop_archive} && tar -xzvf ${hadoop_name}.tar.gz && mv ${hadoop_name} /usr/local/hadoop && rm ${hadoop_name}.tar.gz && chown hadoop:hadoop /usr/local/hadoop -R && chmod 0774 /usr/local/hadoop -R",
       path => '/bin:/usr/bin:/usr/sbin',
+      onlyif => "[ ! -d /usr/local/hadoop ]",
       timeout => 0,
       require => [
         Package['wget'],
@@ -76,8 +75,14 @@ class yarn::hadoop (
       content => template('yarn/hdfs-site.xml.erb')
     }
 
+    file { '/usr/local/hadoop/logs':
+      ensure => directory,
+      group => 'hadoop',
+      mode => 0774
+    }
+
     exec { 'format hdfs':
-      command => '/usr/local/hadoop/bin/hdfs namenode -format &> format_hdfs.log',
+      command => '/usr/local/hadoop/bin/hdfs namenode -format',
       user => 'hdfs',
       cwd => '/usr/local/hadoop',
       require => [
@@ -88,21 +93,22 @@ class yarn::hadoop (
           '/var/data/hadoop/hdfs/nn',
           '/var/data/hadoop/hdfs/snn',
           '/var/data/hadoop/hdfs/dn',
-          '/var/log/hadoop/yarn'
+          '/var/log/hadoop/yarn',
+          '/usr/local/hadoop/logs'
         ],
         Package['oracle-java8-set-default']
       ]
     }
 
     exec { 'start hdfs':
-      command => '/usr/local/hadoop/sbin/hadoop-daemon.sh start namenode && /usr/local/hadoop/sbin/hadoop-daemon.sh start secondarynamenode && /usr/local/hadoop/sbin/hadoop-daemon.sh start datanode &> start_hdfs.log',
+      command => '/usr/local/hadoop/sbin/hadoop-daemon.sh start namenode && /usr/local/hadoop/sbin/hadoop-daemon.sh start secondarynamenode && /usr/local/hadoop/sbin/hadoop-daemon.sh start datanode',
       cwd => '/usr/local/hadoop',
       user => 'hdfs',
       require => Exec['format hdfs']
     }
 
     exec { 'start cluster':
-      command => '/usr/local/hadoop/sbin/yarn-daemon.sh start resourcemanager && /usr/local/hadoop/sbin/yarn-daemon.sh start nodemanager &> start_cluster.log',
+      command => '/usr/local/hadoop/sbin/yarn-daemon.sh start resourcemanager && /usr/local/hadoop/sbin/yarn-daemon.sh start nodemanager',
       cwd => '/usr/local/hadoop',
       user => 'yarn',
       require => Exec['start hdfs']
