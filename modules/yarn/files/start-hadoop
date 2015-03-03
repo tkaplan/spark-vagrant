@@ -1,0 +1,80 @@
+#!/bin/bash
+#
+#
+# Starts a Hadoop Master
+#
+# chkconfig: 2345 90 10
+# description: Hadoop master
+ 
+. /usr/local/hadoop/etc/hadoop/hadoop-env.sh
+export HPATH=/usr/local/hadoop
+export HLOCK=/var/lock/subsys
+
+RETVAL=0
+PIDFILE=$HLOCK/hadoop-hdfs-master.pid
+desc="Hadoop Master daemon"
+ 
+start() {
+  echo -n $"Starting $desc (hadoop): "
+
+  sudo --user hdfs $HPATH/sbin/hadoop-daemon.sh start namenode
+  sudo --user hdfs $HPATH/sbin/hadoop-daemon.sh start secondarynamenode
+  sudo --user hdfs $HPATH/sbin/hadoop-daemon.sh start datanode
+
+  sudo --user yarn $HPATH/sbin/yarn-daemon.sh start resourcemanager
+  sudo --user yarn $HPATH/sbin/yarn-daemon.sh start nodemanager
+
+  RETVAL=0
+}
+ 
+stop() {
+  echo -n $"Stopping $desc (hadoop): "
+  
+  sudo --user hdfs $HPATH/sbin/hadoop-daemon.sh stop namenode
+  sudo --user hdfs $HPATH/sbin/hadoop-daemon.sh stop secondarynamenode
+  sudo --user hdfs $HPATH/sbin/hadoop-daemon.sh stop datanode
+
+  sudo --user yarn $HPATH/sbin/yarn-daemon.sh stop resourcemanager
+  sudo --user yarn $HPATH/sbin/yarn-daemon.sh stop nodemanager
+
+  RETVAL=0
+}
+ 
+checkstatus(){
+  jps |grep NameNode
+}
+ 
+restart() {
+  stop
+  start
+}
+ 
+format() {
+  sudo --user hdfs $HPATH/bin/hadoop namenode -format
+}
+ 
+case "$1" in
+  start)
+    start
+    ;;
+  upgrade)
+    upgrade
+    ;;
+  format)
+    format
+    ;;
+  stop)
+    stop
+    ;;
+  status)
+    checkstatus
+    ;;
+  restart)
+    restart
+    ;;
+  *)
+    echo $"Usage: $0 {start|stop|status|restart|try-restart}"
+    exit 1
+esac
+ 
+exit $RETVAL

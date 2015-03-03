@@ -4,6 +4,11 @@ class yarn::users {
 		ensure => present
 	}
 
+	user { 'vagrant':
+		name => 'vagrant',
+		groups => ['vagrant','hadoop','root']
+	}
+
 	user { 'hadoop':
 		name => 'hadoop',
 		ensure => present,

@@ -81,8 +81,15 @@ class yarn::hadoop (
       mode => 0774
     }
 
+    file { '/etc/init.d/start-hadoop':
+      source => '/vagrant/modules/yarn/files/start-hadoop',
+      group => 'root',
+      mode => 0775
+    }
+
     exec { 'format hdfs':
       command => '/usr/local/hadoop/bin/hdfs namenode -format',
+      environment => ['JAVA_HOME=/usr/lib/jvm/java-8-oracle'],
       user => 'hdfs',
       cwd => '/usr/local/hadoop',
       require => [
@@ -99,18 +106,16 @@ class yarn::hadoop (
         Package['oracle-java8-set-default']
       ]
     }
-
-    exec { 'start hdfs':
-      command => '/usr/local/hadoop/sbin/hadoop-daemon.sh start namenode && /usr/local/hadoop/sbin/hadoop-daemon.sh start secondarynamenode && /usr/local/hadoop/sbin/hadoop-daemon.sh start datanode',
-      cwd => '/usr/local/hadoop',
-      user => 'hdfs',
-      require => Exec['format hdfs']
-    }
-
-    exec { 'start cluster':
-      command => '/usr/local/hadoop/sbin/yarn-daemon.sh start resourcemanager && /usr/local/hadoop/sbin/yarn-daemon.sh start nodemanager',
-      cwd => '/usr/local/hadoop',
-      user => 'yarn',
-      require => Exec['start hdfs']
+    exec { 'Add service':
+      command => 'sysv-rc-conf start-hadoop enable && sysv-rc-conf start-hadoop --level 13 on',
+      cwd => '/',
+      user => 'root',
+      path => '/usr/sbin',
+      require => [
+        File[
+          '/etc/init.d/start-hadoop'
+        ],
+        Package['sysv-rc-conf']
+      ]
     }
 }

@@ -1,1 +1,4 @@
-include apt
+include base
+class { 'spark':
+	slave => false
+}
