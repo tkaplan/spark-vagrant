@@ -1,5 +1,8 @@
 include base
-include yarn
+class { 'yarn':
+	hadoop_included => true
+}
 class { 'spark':
-	slave => true
+	slave => false,
+	spark_included => true
 }

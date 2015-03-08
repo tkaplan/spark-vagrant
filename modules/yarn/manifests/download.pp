@@ -2,17 +2,32 @@ class yarn::download (
   $namenode_port = 9000,
   $dfs_replication = 3,
   $hadoop_archive = "http://mirror.olnevhost.net/pub/apache/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz",
-  $hadoop_name = "hadoop-2.6.0"
+  $hadoop_name = "hadoop-2.6.0",
+  $hadoop_included = false
 ) {
-    exec { 'hadoop_download':
-      command => "wget ${hadoop_archive} && tar -xzvf ${hadoop_name}.tar.gz && mv ${hadoop_name} /usr/local/hadoop && rm ${hadoop_name}.tar.gz && chown hadoop:hadoop /usr/local/hadoop -R && chmod 0774 /usr/local/hadoop -R",
-      path => '/bin:/usr/bin:/usr/sbin',
-      onlyif => "[ ! -d /usr/local/hadoop ]",
-      timeout => 0,
-      require => [
-        Package['wget'],
-        User['hadoop']
-      ]
+
+    if !$hadoop_included {
+      exec { 'hadoop_download':
+        command => "wget ${hadoop_archive} && tar -xzvf ${hadoop_name}.tar.gz && mv ${hadoop_name} /usr/local/hadoop && rm ${hadoop_name}.tar.gz && chown hadoop:hadoop /usr/local/hadoop -R && chmod 0775 /usr/local/hadoop -R",
+        path => '/bin:/usr/bin:/usr/sbin',
+        onlyif => "[ ! -d /usr/local/hadoop ]",
+        timeout => 0,
+        require => [
+          Package['wget'],
+          User['hadoop']
+        ]
+      }
+    } else {
+      exec { 'hadoop_download':
+        command => "mv hadoop*.tar.gz hadoop.tar.gz  && tar -xzvf hadoop.tar.gz && rm hadoop.tar.gz && mv /vagrant/hadoop* /usr/local/hadoop && chown hadoop:hadoop /usr/local/hadoop -R && chmod 0775 /usr/local/hadoop -R",
+        path => '/bin:/usr/bin:/usr/sbin',
+        onlyif => "[ ! -d /usr/local/hadoop ]",
+        timeout => 0,
+        require => [
+          Package['wget'],
+          User['hadoop']
+        ]
+      }
     }
 
     exec { 'format hdfs':

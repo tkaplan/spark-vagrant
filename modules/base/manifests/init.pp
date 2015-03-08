@@ -7,8 +7,9 @@ class base {
   exec { 'accept_oracle_java_license':
     command => 'echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections && echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections',
     path => "/usr/bin/:/bin/",
-    logoutput => true,
+    logoutput => true
   }
+  
   package { 'oracle-java8-installer':
     require => [Apt::Ppa['ppa:webupd8team/java'], Exec['accept_oracle_java_license']],
     ensure => installed
@@ -23,6 +24,14 @@ class base {
   }
   package { 'scala':
     require => Package['oracle-java8-set-default'],
+    ensure => installed
+  }
+
+  package { 'wget':
+    ensure => installed
+  }
+
+  package { 'rsync':
     ensure => installed
   }
 }

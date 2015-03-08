@@ -63,10 +63,4 @@ class yarn::fs {
       group => 'hadoop',
       mode => 0774
     }
-
-    file { '/etc/init.d/start-hadoop':
-      source => '/vagrant/modules/yarn/files/start-hadoop',
-      group => 'root',
-      mode => 0775
-    }
 }

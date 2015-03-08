@@ -1,10 +1,17 @@
-class yarn {
+class yarn (
+	$hadoop_included = false
+) {
   file { '/etc/profile.d/environment.sh':
     source => '/vagrant/modules/yarn/files/environment.sh'
   }
 
-  include yarn::packages
   include yarn::users
-  include yarn::hadoop
+  
+  class { 'yarn::download':
+  	hadoop_included => $hadoop_included
+  }
+
+  include yarn::daemons
+  include yarn::fs
 
 }
