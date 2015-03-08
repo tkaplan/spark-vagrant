@@ -25,7 +25,4 @@ class base {
     require => Package['oracle-java8-set-default'],
     ensure => installed
   }
-  package { 'sysv-rc-conf':
-    ensure => installed
-  }
 }

@@ -26,10 +26,4 @@ class yarn::users {
 		groups => ['hadoop'],
 		require => User['hadoop']
 	}
-
-	user { 'mapred':
-		ensure => present,
-		groups => ['hadoop'],
-		require => User['hadoop']
-	}
 }
