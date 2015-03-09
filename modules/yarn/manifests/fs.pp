@@ -1,5 +1,16 @@
-class yarn::fs {
-	file { [
+class yarn::fs (
+  $master = false,
+  $namenode_port = 8020,
+  $dfs_replication = 3,
+  $resourcemanager_hostname = 'spark.master'
+) {
+
+    exec { 'set hosts':
+      command => "echo '10.0.0.2 spark.master' >> /etc/hosts",
+      path => '/usr/bin:/bin:/usr/local/sbin'
+    }
+
+    file { [
       '/var/data',
       '/var/data/hadoop',
       '/var/log/hadoop'
@@ -56,6 +67,16 @@ class yarn::fs {
       group => 'hadoop',
       mode => 0774,
       content => template('yarn/hdfs-site.xml.erb')
+    }
+
+    file { [
+      '/usr/local/hadoop/etc/hadoop/yarn-site.xml'
+    ]:
+      require => Exec['hadoop_download'],
+      ensure => file,
+      group => 'hadoop',
+      mode => 0774,
+      content => template('yarn/yarn-site.xml.erb')
     }
 
     file { '/usr/local/hadoop/logs':

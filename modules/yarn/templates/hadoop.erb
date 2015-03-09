@@ -22,15 +22,17 @@ start() {
         echo -n "Starting : "
         echo -n "Starting hdfs..."
 
-        sudo -u hdfs bash $HADOOP_HOME/sbin/hadoop-daemon.sh start namenode
-        sudo -u hdfs bash $HADOOP_HOME/sbin/hadoop-daemon.sh start secondarynamenode
-        sudo -u hdfs bash $HADOOP_HOME/sbin/hadoop-daemon.sh start datanode
+        sudo -u hdfs JAVA_HOME=$JAVA_HOME bash $HADOOP_HOME/sbin/hadoop-daemon.sh start namenode
+        sudo -u hdfs JAVA_HOME=$JAVA_HOME bash $HADOOP_HOME/sbin/hadoop-daemon.sh start secondarynamenode
+        sudo -u hdfs JAVA_HOME=$JAVA_HOME bash $HADOOP_HOME/sbin/hadoop-daemon.sh start datanode
         
         echo -n "Starting yarn..."
 
-        sudo -u yarn bash $HADOOP_HOME/sbin/yarn-daemon.sh start resourcemanager
-        sudo -u yarn bash $HADOOP_HOME/sbin/yarn-daemon.sh start nodemanager
-
+        <% if @master %>
+        sudo -u yarn JAVA_HOME=$JAVA_HOME bash $HADOOP_HOME/sbin/yarn-daemon.sh start resourcemanager
+        sudo -u yarn JAVA_HOME=$JAVA_HOME bash $HADOOP_HOME/sbin/yarn-daemon.sh start nodemanager
+        <% end %>
+        
         touch /var/lock/subsys/
         return
 }
@@ -45,7 +47,10 @@ stop() {
         
         echo -n "Stopping yarn..."
 
+        <% if @master %>
         sudo -u yarn bash $HADOOP_HOME/sbin/yarn-daemon.sh stop resourcemanager
+        <% end %>
+
         sudo -u yarn bash $HADOOP_HOME/sbin/yarn-daemon.sh stop nodemanager
 
         rm -f /var/lock/subsys/

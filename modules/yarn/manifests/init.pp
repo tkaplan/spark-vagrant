@@ -1,8 +1,9 @@
 class yarn (
-	$hadoop_included = false
+	$hadoop_included = false,
+	$master = false
 ) {
-  file { '/etc/profile.d/environment.sh':
-    source => '/vagrant/modules/yarn/files/environment.sh'
+  file { '/etc/environment':
+    source => '/vagrant/modules/yarn/files/environment'
   }
 
   include yarn::users
@@ -12,6 +13,8 @@ class yarn (
   }
 
   include yarn::daemons
-  include yarn::fs
+  class { 'yarn::fs':
+  	master => $master
+  }
 
 }

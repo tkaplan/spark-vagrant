@@ -19,7 +19,7 @@ class yarn::download (
       }
     } else {
       exec { 'hadoop_download':
-        command => "mv hadoop*.tar.gz hadoop.tar.gz  && tar -xzvf hadoop.tar.gz && rm hadoop.tar.gz && mv /vagrant/hadoop* /usr/local/hadoop && chown hadoop:hadoop /usr/local/hadoop -R && chmod 0775 /usr/local/hadoop -R",
+        command => "tar -xzvf /vagrant/hadoop*.tar.gz && mv hadoop* /usr/local/hadoop && chown hadoop:hadoop /usr/local/hadoop -R && chmod 0775 /usr/local/hadoop -R",
         path => '/bin:/usr/bin:/usr/sbin',
         onlyif => "[ ! -d /usr/local/hadoop ]",
         timeout => 0,

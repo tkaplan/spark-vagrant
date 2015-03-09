@@ -1,0 +1,4 @@
+HADOOP_PREFIX="/usr/local/hadoop"
+HADOOP_CONF_DIR="/usr/local/hadoop/etc/hadoop"
+JAVA_HOME="/usr/lib/jvm/java-8-oracle"
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"

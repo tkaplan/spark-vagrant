@@ -2,7 +2,7 @@ Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/trusty64"
 
   config.vm.define "spark-master" do |box|
-    box.vm.hostname = "spark.master"
+    box.vm.hostname = "master"
     box.vm.network "forwarded_port", guest: 8080, host: 8080
     box.vm.network "forwarded_port", guest: 50070, host: 50070
     box.vm.network "forwarded_port", guest: 9000, host: 9000
@@ -23,7 +23,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.define "spark-slave0" do |box|
-    box.vm.hostname = "spark.slave0"
+    box.vm.hostname = "slave0"
     box.vm.network "private_network", ip: "10.0.0.3"
     box.vm.provision "puppet" do |puppet|
       puppet.module_path = "modules"
@@ -40,7 +40,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.define "spark-slave1" do |box|
-    box.vm.hostname = "spark.slave1"
+    box.vm.hostname = "slave1"
     box.vm.network "private_network", ip: "10.0.0.4"
     box.vm.provision "puppet" do |puppet|
       puppet.module_path = "modules"

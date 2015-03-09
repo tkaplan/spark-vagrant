@@ -18,8 +18,8 @@
 
 <configuration>
 	<property>
-		<name>fs.default.name</name>
-		<value>hdfs://localhost:<%= @namenode_port %></value>
+		<name>fs.defaultFS</name>
+		<value>hdfs://spark.master:<%= @namenode_port %></value>
 	</property>
 	<property>
 		<name>hadoop.http.staticuser.user</name>
