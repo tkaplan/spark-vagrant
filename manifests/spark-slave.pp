@@ -4,6 +4,7 @@ class { 'yarn':
 	master => false
 }
 class { 'spark':
+	with_yarn => true,
 	slave => true,
 	spark_included => true
 }
