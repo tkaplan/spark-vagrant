@@ -15,11 +15,13 @@ class { 'spark':
 }
 
 1 B)
+
 However to get the machines up and running asap, simply download hadoop-2.6.0.tar.gz and spark-1.2.1-bin-hadoop2.4.tgz and put them into the root of this vagrant project. This makes provisioning MUCH MUCH faster since the binaries are not redownloaded on the other machines.
 
 2) vagrant up
 
 3) vagrant reload
+
   The services on the vm's are started by way of init.d. That means that once you are finished provisioning, the spark services won't immediately boot up. Instead you must restart the machines with vagrant reload.
   
 ## About the cluster
@@ -30,22 +32,26 @@ In your browser go to ->
 10.0.0.2:8088
 
 Access to webapp hdfs:
+
 In your browser go to ->
+
 localhost:50070 (10.0.0.2:50070 doesn't not work because it binds to localhost address, I don't care to figure out the configuration to correct this. Please submit a PR if you can fix this)
 
 Access to spark cluster:
+
 In your browser go to ->
+
 10.0.0.2:8080
+
 
 10.0.0.2
 - Master
 - Slave
 
+
 10.0.0.3
 - Slave0
 
+
 10.0.0.4
 - Slave1
-To access hadoop web-api go to -> 10.0.0.2:8088 
-
-
