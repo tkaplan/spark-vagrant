@@ -16,7 +16,7 @@ class { 'spark':
 
 1 B)
 
-However to get the machines up and running asap, simply download hadoop-2.6.0.tar.gz and spark-1.2.1-bin-hadoop2.4.tgz and put them into the root of this vagrant project. This makes provisioning MUCH MUCH faster since the binaries are not redownloaded on the other machines.
+However to get the machines up and running asap, simply run bash download-binaries.sh. This makes provisioning MUCH MUCH faster since the binaries are downloaded only once.
 
 2) vagrant up
 
