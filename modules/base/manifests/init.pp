@@ -1,6 +1,4 @@
-class base (
-    $scala_version = '10.5'
-) {
+class base {
 
     include apt
 
@@ -42,15 +40,5 @@ class base (
     file { '/home/vagrant/scala.sh':
       ensure => file,
       content => template('base/scala.sh.erb')
-    }
-
-    exec { 'install scala':
-      command => 'bash /home/vagrant/scala.sh',
-      path => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-      timeout => 0,
-      require => [
-        File['/home/vagrant/scala.sh'],
-        Package['oracle-java8-set-default']
-      ]
     }
 }

@@ -5,11 +5,6 @@ class yarn::fs (
   $resourcemanager_hostname = 'spark.master'
 ) {
 
-    exec { 'set hosts':
-      command => 'echo "$(cat /vagrant/tmp/master) spark.master" >> /etc/hosts',
-      path => '/usr/bin:/bin:/usr/local/sbin'
-    }
-
     file { [
       '/var/data',
       '/var/data/hadoop',

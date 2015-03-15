@@ -1,6 +1,4 @@
-class { 'base':
-	scala_version => '10.5'
-}
+include base
 
 class { 'yarn':
 	hadoop_included => true,
