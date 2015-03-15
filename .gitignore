@@ -1,0 +1,4 @@
+.vagrant
+./spark*.tgz
+./hadoop*.tar.gz
+./jars/*.jar

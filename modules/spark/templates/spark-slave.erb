@@ -1,0 +1,51 @@
+#!/bin/bash
+#
+#       /etc/init.d
+#
+#
+### BEGIN INIT INFO
+# Provides: spark-slave
+# Required-Start: $remote_fs $syslog
+# Required-Stop: $remote_fs $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start daemon at boot time
+# Description: Enable service provided by daemon.
+### END INIT INFO
+
+
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin
+export JAVA_HOME="/usr/lib/jvm/java-8-oracle"
+export SPARK_LOCAL_IP=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1 -d'/')
+
+start() {
+        echo -n "Starting : "
+        sudo -u spark HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop SPARK_LOCAL_IP=$SPARK_LOCAL_IP JAVA_HOME=$JAVA_HOME bash /usr/local/spark/sbin/start-slave.sh --properties-file spark://spark.master:7077
+        touch /var/lock/subsys/
+        return
+}
+
+stop() {
+        echo -n "Shutting down : "
+        sudo -u spark bash /usr/local/spark/sbin/stop-slave.sh
+        rm -f /var/lock/subsys/
+        return
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        echo -n "Ok"
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    reload)
+esac
+exit 0

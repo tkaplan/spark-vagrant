@@ -1,0 +1,2 @@
+sudo -u hdfs JAVA_HOME=/usr/lib/jvm/java-8-oracle /usr/local/hadoop/bin/hdfs dfs -mkdir /spark
+sudo -u hdfs JAVA_HOME=/usr/lib/jvm/java-8-oracle /usr/local/hadoop/bin/hdfs dfs -put /vagrant/jars/* /spark

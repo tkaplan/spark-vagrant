@@ -1,0 +1,11 @@
+#!/bin/bash
+
+wget http://www.scala-lang.org/files/archive/scala-2.<%= @scala_version %>.deb
+
+inst() {
+	apt-get install -f
+	dpkg -i scala-2.<%= @scala_version %>.deb
+}
+
+dpkg -i scala-2.<%= @scala_version %>.deb || inst
+exit 0

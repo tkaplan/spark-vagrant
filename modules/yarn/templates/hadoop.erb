@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+#       /etc/init.d
+#
+#
+### BEGIN INIT INFO
+# Provides: hadoop
+# Required-Start: $remote_fs $syslog
+# Required-Stop: $remote_fs $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start daemon at boot time
+# Description: Enable service provided by daemon.
+### END INIT INFO
+
+
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin
+export JAVA_HOME="/usr/lib/jvm/java-8-oracle"
+export HADOOP_HOME=/usr/local/hadoop
+
+start() {
+        echo -n "Starting : "
+        echo -n "Starting hdfs..."
+
+        sudo -u hdfs JAVA_HOME=$JAVA_HOME bash $HADOOP_HOME/sbin/hadoop-daemon.sh start namenode
+        sudo -u hdfs JAVA_HOME=$JAVA_HOME bash $HADOOP_HOME/sbin/hadoop-daemon.sh start secondarynamenode
+        sudo -u hdfs JAVA_HOME=$JAVA_HOME bash $HADOOP_HOME/sbin/hadoop-daemon.sh start datanode
+        
+        echo -n "Starting yarn..."
+
+        <% if @master %>
+        sudo -u yarn JAVA_HOME=$JAVA_HOME bash $HADOOP_HOME/sbin/yarn-daemon.sh start resourcemanager
+        sudo -u yarn JAVA_HOME=$JAVA_HOME bash $HADOOP_HOME/sbin/yarn-daemon.sh start nodemanager
+        <% end %>
+        
+        touch /var/lock/subsys/
+        return
+}
+
+stop() {
+        echo -n "Shutting down : "
+        echo -n "Stopping hdfs..."
+
+        sudo -u hdfs bash $HADOOP_HOME/sbin/hadoop-daemon.sh stop namenode
+        sudo -u hdfs bash $HADOOP_HOME/sbin/hadoop-daemon.sh stop secondarynamenode
+        sudo -u hdfs bash $HADOOP_HOME/sbin/hadoop-daemon.sh stop datanode
+        
+        echo -n "Stopping yarn..."
+
+        <% if @master %>
+        sudo -u yarn bash $HADOOP_HOME/sbin/yarn-daemon.sh stop resourcemanager
+        <% end %>
+
+        sudo -u yarn bash $HADOOP_HOME/sbin/yarn-daemon.sh stop nodemanager
+
+        rm -f /var/lock/subsys/
+        return
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        echo -n "Ok"
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    reload)
+esac
+exit 0
