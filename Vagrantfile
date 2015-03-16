@@ -55,7 +55,14 @@ Vagrant.configure(2) do |config|
 
       box.vm.provision "trigger", :option => "value" do |trigger|
         trigger.fire do
+          # Add spark.master ip
           run "vagrant ssh spark-slave#{i} -c \"echo '#{output.strip} spark.master' | sudo tee --append /etc/hosts\""
+          
+          # Add own ip
+          my_ip_address = %Q(vagrant ssh spark-master -c 'ifconfig | grep -oP "inet addr:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | grep -oP "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}" | tail -n 2 | head -n 1')
+          my_ip_address = run my_ip_address
+          run "vagrant ssh spark-slave#{i} -c \"echo '#{output.strip} spark.slave' | sudo tee --append /etc/hosts\""
+
         end
       end
 

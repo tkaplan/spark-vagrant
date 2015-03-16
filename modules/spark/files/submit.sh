@@ -1,1 +1,1 @@
-SPARK_LOCAL_IP=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1 -d'/') /usr/local/spark/bin/spark-submit --class $1 --deploy-mode cluster hdfs:///spark/$2
+/usr/local/spark/bin/spark-submit --class $1 --deploy-mode cluster --master spark://spark.master:7077 hdfs:///spark/$2

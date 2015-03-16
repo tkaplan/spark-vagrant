@@ -47,7 +47,10 @@
 # - SPARK_PID_DIR       Where the pid file is stored. (Default: /tmp)
 # - SPARK_IDENT_STRING  A string representing this instance of spark. (Default: $USER)
 # - SPARK_NICENESS      The scheduling priority for daemons. (Default: 0)
+
+<% if !@master %>
 export SPARK_LOCAL_IP=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1 -d'/')
 export SPARK_MASTER_IP=spark.master
-export SPARK_LOCAL_IP=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1 -d'/')
+<% end %>
 export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop
+export SPARK_WORKER_PORT=9919

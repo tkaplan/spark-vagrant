@@ -1,4 +1,6 @@
-class base {
+class base (
+    $scala_version = '10.5'
+) {
 
     include apt
 
@@ -35,10 +37,5 @@ class base {
 
     package { 'rsync':
       ensure => installed
-    }
-
-    file { '/home/vagrant/scala.sh':
-      ensure => file,
-      content => template('base/scala.sh.erb')
     }
 }
