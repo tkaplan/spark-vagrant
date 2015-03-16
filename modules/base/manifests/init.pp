@@ -1,6 +1,4 @@
-class base (
-    $scala_version = '10.5'
-) {
+class base {
 
     include apt
 
